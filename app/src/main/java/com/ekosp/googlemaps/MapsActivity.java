@@ -60,6 +60,8 @@ public class MapsActivity extends FragmentActivity implements
     private DatabaseReference mFirebaseDatabase;
     private FirebaseDatabase mFirebaseInstance;
 
+    Marker mk1 = null;
+
    // private String userId = "-KtKG3cR2IJ3KJI7DsSo";
 
 
@@ -108,7 +110,9 @@ public class MapsActivity extends FragmentActivity implements
         // User data change listener
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("users/-KtQOGrbo64-NOWStkHZ");
+        DatabaseReference ref = database.getReference("users/hello_ekosp_com");
+
+       // final Marker[] mk1 = {null};
 
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -120,13 +124,21 @@ public class MapsActivity extends FragmentActivity implements
                     return;
                 }
                 Log.e(TAG, "User data is changed!" + user.name + ", " + user.email);
-                // Display newly updated name and email
-               // txtDetails.setText(user.name + ", " + user.email);
-                // clear edit text
-              //  inputEmail.setText("");
-              //  inputName.setText("");
-               // toggleButton();
-                Toast.makeText(MapsActivity.this, "new user location :"+user.name+" , "+user.email, Toast.LENGTH_SHORT).show();
+
+                // Add a marker in Sydney and move the camera
+
+              if (mk1 != null) mk1.remove();
+                LatLng custom = new LatLng(Double.parseDouble(user.latitude),
+                        Double.parseDouble(user.longitude));
+                options.position(custom);
+                options.title("someTitle");
+                options.snippet("someDesc");
+                options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_round));
+               // mMap.addMarker(new MarkerOptions().position(custom).title("Marker in Custom"));
+                mk1 = mMap.addMarker(options);
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(custom));
+
+                Toast.makeText(MapsActivity.this, "new user location :\n"+user.longitude+" , "+user.latitude, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -167,12 +179,12 @@ public class MapsActivity extends FragmentActivity implements
         }
 
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
+      /*  LatLng sydney = new LatLng(-34, 151);
        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
 
 
-        latlngs.add(new LatLng(-6, 106)); //some latitude and logitude value
+       /* latlngs.add(new LatLng(-6, 106)); //some latitude and logitude value
         latlngs.add(new LatLng(-6.0022, 106.0022)); //some latitude and logitude value
         for (LatLng point : latlngs) {
             options.position(point);
@@ -180,7 +192,7 @@ public class MapsActivity extends FragmentActivity implements
             options.snippet("someDesc");
             options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_round));
             googleMap.addMarker(options);
-        }
+        }*/
 
     }
 
@@ -211,7 +223,7 @@ public class MapsActivity extends FragmentActivity implements
 
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(101));
 
         //stop location updates
         if (mGoogleApiClient != null) {

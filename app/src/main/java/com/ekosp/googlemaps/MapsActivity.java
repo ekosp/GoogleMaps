@@ -26,6 +26,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
@@ -36,6 +38,11 @@ public class MapsActivity extends FragmentActivity implements
     LocationRequest mLocationRequest;
     Location mLastLocation;
     Marker mCurrLocationMarker;
+
+    private GoogleMap googleMap;
+    private MarkerOptions options = new MarkerOptions();
+    private ArrayList<LatLng> latlngs = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +87,18 @@ public class MapsActivity extends FragmentActivity implements
         LatLng sydney = new LatLng(-34, 151);
        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+
+
+        latlngs.add(new LatLng(-6, 106)); //some latitude and logitude value
+        latlngs.add(new LatLng(-6.0022, 106.0022)); //some latitude and logitude value
+        for (LatLng point : latlngs) {
+            options.position(point);
+            options.title("someTitle");
+            options.snippet("someDesc");
+            options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher_round));
+            googleMap.addMarker(options);
+        }
+
     }
 
     protected synchronized void buildGoogleApiClient() {

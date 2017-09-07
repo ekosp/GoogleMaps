@@ -3,6 +3,8 @@ package com.ekosp.googlemaps;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+
+import com.ekosp.googlemaps.model.User;
 import com.google.android.gms.location.LocationListener;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -11,6 +13,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -25,6 +31,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -42,6 +53,15 @@ public class MapsActivity extends FragmentActivity implements
     private GoogleMap googleMap;
     private MarkerOptions options = new MarkerOptions();
     private ArrayList<LatLng> latlngs = new ArrayList<>();
+    private static final String TAG = MapsActivity.class.getSimpleName();
+   // private TextView txtDetails;
+  //  private EditText inputName, inputEmail;
+   // private Button btnSave;
+    private DatabaseReference mFirebaseDatabase;
+    private FirebaseDatabase mFirebaseInstance;
+
+   // private String userId = "-KtKG3cR2IJ3KJI7DsSo";
+
 
 
     @Override
@@ -52,6 +72,69 @@ public class MapsActivity extends FragmentActivity implements
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        mFirebaseInstance = FirebaseDatabase.getInstance();
+        // get reference to 'users' node
+        mFirebaseDatabase = mFirebaseInstance.getReference("users");
+        // store app title to 'app_title' node
+        mFirebaseInstance.getReference("app_title").setValue("Realtime Database");
+
+
+        addUserChangeListener();
+       /*
+        // Get a reference to our posts
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("users/-KtKG3cR2IJ3KJI7DsSo");
+
+            // Attach a listener to read the data at our posts reference
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User post = dataSnapshot.getValue(User.class);
+                System.out.println(post);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getCode());
+            }
+        });*/
+    }
+
+    /**
+     * User data change listener
+     */
+    private void addUserChangeListener() {
+        // User data change listener
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference ref = database.getReference("users/-KtQOGrbo64-NOWStkHZ");
+
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                // Check for null
+                if (user == null) {
+                    Log.e(TAG, "User data is null!");
+                    return;
+                }
+                Log.e(TAG, "User data is changed!" + user.name + ", " + user.email);
+                // Display newly updated name and email
+               // txtDetails.setText(user.name + ", " + user.email);
+                // clear edit text
+              //  inputEmail.setText("");
+              //  inputName.setText("");
+               // toggleButton();
+                Toast.makeText(MapsActivity.this, "new user location :"+user.name+" , "+user.email, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                Log.e(TAG, "Failed to read user", error.toException());
+            }
+        });
     }
 
     /**
